@@ -9,31 +9,47 @@ jobs:
         with:
           flutter-version: '3.22.0'
           channel: 'stable'
+      - run: flutter create myapp
+      - run: sed -i 's/android:label="myapp"/android:label="Scam Shield"/' myapp/android/app/src/main/AndroidManifest.xml
+      - run: sed -i 's/name: myapp/name: scam_shield/' myapp/pubspec.yaml
       - run: |
-          flutter create myapp
-          cat > myapp/lib/main.dart << 'EOF'
+          cat > myapp/lib/main.dart << 'ENDOFFILE'
           import 'package:flutter/material.dart';
-          void main() => runApp(ScamShieldApp());
-          class ScamShieldApp extends StatelessWidget {
-            @override Widget build(BuildContext context) {
-              return MaterialApp(debugShowCheckedModeBanner: false, home: HomePage());
-            }
-          }
+          void main() => runApp(MaterialApp(debugShowCheckedModeBanner: false, home: HomePage()));
+
           class HomePage extends StatefulWidget { @override _HomePageState createState() => _HomePageState(); }
           class _HomePageState extends State<HomePage> {
-            TextEditingController _c = TextEditingController();
-            String res = "Number daal ke check karo"; Color col = Colors.grey;
-            void check(){
-              String n=_c.text;
-              if(n.length<10){setState((){res="Sahi number daalo"; col=Colors.orange;}); return;}
-              if(n.endsWith("0")||n.endsWith("1")){setState((){res="SCAM HO SAKTA HAI!"; col=Colors.red;});}
-              else{setState((){res="Safe Hai"; col=Colors.green;});}
+            int _tab = 0;
+            final _numC = TextEditingController();
+            final _linkC = TextEditingController();
+            final _upiC = TextEditingController();
+            String _res = "Check karo";
+            Color _col = Colors.blue;
+
+            void _checkNum() {
+              String n = _numC.text;
+              if(n.length < 10){ setState((){ _res = "10 digit daalo"; _col = Colors.orange;}); return;}
+              if(n.startsWith("140") || n.contains("000")) setState((){ _res = "🚨 HIGH RISK SCAM!"; _col = Colors.red;});
+              else setState((){ _res = "✅ SAFE number"; _col = Colors.green;});
             }
-            @override Widget build(BuildContext context){
-              return Scaffold(appBar: AppBar(title: Text("Scam Shield")), body: Padding(padding: EdgeInsets.all(20), child: Column(children: [Icon(Icons.security,size:80,color:Colors.blue),SizedBox(height:20),TextField(controller:_c, decoration: InputDecoration(labelText:"Phone Number",border:OutlineInputBorder())),SizedBox(height:20),ElevatedButton(onPressed:check, child: Text("CHECK KARO")),SizedBox(height:20),Container(padding:EdgeInsets.all(20), decoration: BoxDecoration(color:col.withOpacity(0.2), borderRadius: BorderRadius.circular(10), border: Border.all(color:col)), child: Text(res, style: TextStyle(fontSize:20, color:col)))])));
+            void _checkLink() {
+              String l = _linkC.text.toLowerCase();
+              if(l.contains("bit.ly") || l.contains("tinyurl") || l.contains("free") || l.contains("kyc") || l.contains("lottery")) setState((){ _res = "🚨 FAKE LINK! Click mat karo"; _col = Colors.red;});
+              else setState((){ _res = "✅ Link sahi hai"; _col = Colors.green;});
+            }
+            void _checkUpi() {
+              String u = _upiC.text.toLowerCase();
+              if(u.length > 15 || u.contains("@ok")) setState((){ _res = "🚨 UPI FRAUD!"; _col = Colors.red;});
+              else setState((){ _res = "✅ UPI okay hai"; _col = Colors.green;});
+            }
+
+            @override Widget build(BuildContext context) {
+              final page1 = ListView(padding: EdgeInsets.all(16), children: [Center(child: Icon(Icons.shield, size: 80, color: Colors.blue)), SizedBox(height:20), TextField(controller: _numC, decoration: InputDecoration(labelText: "Phone Number", border: OutlineInputBorder(), prefixIcon: Icon(Icons.phone))), SizedBox(height:10), ElevatedButton(onPressed: _checkNum, child: Text("CHECK KARO")), SizedBox(height:20), Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: _col.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: _col)), child: Text(_res, style: TextStyle(color: _col, fontWeight: FontWeight.bold, fontSize: 18)))]);
+              final page2 = ListView(padding: EdgeInsets.all(16), children: [Text("All 11 Features", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)), Divider(), TextField(controller: _linkC, decoration: InputDecoration(labelText: "1. Link Scanner - yaha paste karo", border: OutlineInputBorder())), ElevatedButton(onPressed: _checkLink, child: Text("Scan Link")), SizedBox(height:10), TextField(controller: _upiC, decoration: InputDecoration(labelText: "2. UPI ID Checker", border: OutlineInputBorder())), ElevatedButton(onPressed: _checkUpi, child: Text("Check UPI")), Divider(), ListTile(leading: Icon(Icons.work, color: Colors.red), title: Text("3. Job Scam - Paise mange to scam")), ListTile(leading: Icon(Icons.account_balance, color: Colors.red), title: Text("4. Loan Scam - Fee mange to scam")), ListTile(leading: Icon(Icons.card_giftcard, color: Colors.red), title: Text("5. Lottery / KBC Scam")), ListTile(leading: Icon(Icons.sim_card, color: Colors.orange), title: Text("6. KYC Block Scam")), ListTile(leading: Icon(Icons.sms, color: Colors.orange), title: Text("7. OTP Fraud Protection")), ListTile(leading: Icon(Icons.chat, color: Colors.green), title: Text("8. WhatsApp Scam Filter")), ListTile(leading: Icon(Icons.shopping_cart, color: Colors.green), title: Text("9. OLX / Shopping Scam")), ListTile(leading: Icon(Icons.block, color: Colors.black), title: Text("10. Blacklist Number")), ListTile(leading: Icon(Icons.record_voice_over, color: Colors.black), title: Text("11. Auto Scam Alert")),]);
+              return Scaffold(appBar: AppBar(title: Text("Scam Shield - 11 in 1")), body: _tab==0? page1 : page2, bottomNavigationBar: BottomNavigationBar(currentIndex: _tab, onTap: (i){setState(()=>_tab=i);}, items: [BottomNavigationBarItem(icon: Icon(Icons.phone), label: "Number Check"), BottomNavigationBarItem(icon: Icon(Icons.security), label: "All 11 Features")]));
             }
           }
-          EOF
+          ENDOFFILE
       - run: cd myapp && flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
