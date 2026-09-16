@@ -8,48 +8,24 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
-          channel: 'stable'
       - run: flutter create myapp
-      - run: sed -i 's/android:label="myapp"/android:label="Scam Shield"/' myapp/android/app/src/main/AndroidManifest.xml
-      - run: sed -i 's/name: myapp/name: scam_shield/' myapp/pubspec.yaml
       - run: |
-          cat > myapp/lib/main.dart << 'ENDOFFILE'
+          cat > myapp/lib/main.dart << 'ENDDART'
           import 'package:flutter/material.dart';
-          void main() => runApp(MaterialApp(debugShowCheckedModeBanner: false, home: HomePage()));
-
-          class HomePage extends StatefulWidget { @override _HomePageState createState() => _HomePageState(); }
-          class _HomePageState extends State<HomePage> {
-            int _tab = 0;
-            final _numC = TextEditingController();
-            final _linkC = TextEditingController();
-            final _upiC = TextEditingController();
-            String _res = "Check karo";
-            Color _col = Colors.blue;
-
-            void _checkNum() {
-              String n = _numC.text;
-              if(n.length < 10){ setState((){ _res = "10 digit daalo"; _col = Colors.orange;}); return;}
-              if(n.startsWith("140") || n.contains("000")) setState((){ _res = "🚨 HIGH RISK SCAM!"; _col = Colors.red;});
-              else setState((){ _res = "✅ SAFE number"; _col = Colors.green;});
-            }
-            void _checkLink() {
-              String l = _linkC.text.toLowerCase();
-              if(l.contains("bit.ly") || l.contains("tinyurl") || l.contains("free") || l.contains("kyc") || l.contains("lottery")) setState((){ _res = "🚨 FAKE LINK! Click mat karo"; _col = Colors.red;});
-              else setState((){ _res = "✅ Link sahi hai"; _col = Colors.green;});
-            }
-            void _checkUpi() {
-              String u = _upiC.text.toLowerCase();
-              if(u.length > 15 || u.contains("@ok")) setState((){ _res = "🚨 UPI FRAUD!"; _col = Colors.red;});
-              else setState((){ _res = "✅ UPI okay hai"; _col = Colors.green;});
-            }
-
-            @override Widget build(BuildContext context) {
-              final page1 = ListView(padding: EdgeInsets.all(16), children: [Center(child: Icon(Icons.shield, size: 80, color: Colors.blue)), SizedBox(height:20), TextField(controller: _numC, decoration: InputDecoration(labelText: "Phone Number", border: OutlineInputBorder(), prefixIcon: Icon(Icons.phone))), SizedBox(height:10), ElevatedButton(onPressed: _checkNum, child: Text("CHECK KARO")), SizedBox(height:20), Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: _col.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: _col)), child: Text(_res, style: TextStyle(color: _col, fontWeight: FontWeight.bold, fontSize: 18)))]);
-              final page2 = ListView(padding: EdgeInsets.all(16), children: [Text("All 11 Features", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)), Divider(), TextField(controller: _linkC, decoration: InputDecoration(labelText: "1. Link Scanner - yaha paste karo", border: OutlineInputBorder())), ElevatedButton(onPressed: _checkLink, child: Text("Scan Link")), SizedBox(height:10), TextField(controller: _upiC, decoration: InputDecoration(labelText: "2. UPI ID Checker", border: OutlineInputBorder())), ElevatedButton(onPressed: _checkUpi, child: Text("Check UPI")), Divider(), ListTile(leading: Icon(Icons.work, color: Colors.red), title: Text("3. Job Scam - Paise mange to scam")), ListTile(leading: Icon(Icons.account_balance, color: Colors.red), title: Text("4. Loan Scam - Fee mange to scam")), ListTile(leading: Icon(Icons.card_giftcard, color: Colors.red), title: Text("5. Lottery / KBC Scam")), ListTile(leading: Icon(Icons.sim_card, color: Colors.orange), title: Text("6. KYC Block Scam")), ListTile(leading: Icon(Icons.sms, color: Colors.orange), title: Text("7. OTP Fraud Protection")), ListTile(leading: Icon(Icons.chat, color: Colors.green), title: Text("8. WhatsApp Scam Filter")), ListTile(leading: Icon(Icons.shopping_cart, color: Colors.green), title: Text("9. OLX / Shopping Scam")), ListTile(leading: Icon(Icons.block, color: Colors.black), title: Text("10. Blacklist Number")), ListTile(leading: Icon(Icons.record_voice_over, color: Colors.black), title: Text("11. Auto Scam Alert")),]);
-              return Scaffold(appBar: AppBar(title: Text("Scam Shield - 11 in 1")), body: _tab==0? page1 : page2, bottomNavigationBar: BottomNavigationBar(currentIndex: _tab, onTap: (i){setState(()=>_tab=i);}, items: [BottomNavigationBarItem(icon: Icon(Icons.phone), label: "Number Check"), BottomNavigationBarItem(icon: Icon(Icons.security), label: "All 11 Features")]));
+          void main()=>runApp(MaterialApp(debugShowCheckedModeBanner:false, home: Home()));
+          class Home extends StatefulWidget{ @override State<Home> createState()=>_H();}
+          class _H extends State<Home>{
+            int t=0; var a=TextEditingController(); var b=TextEditingController(); var c=TextEditingController(); String r="Result"; Color co=Colors.blue;
+            void f1(){var s=a.text; setState((){if(s.length<10){r="10 digit likho"; co=Colors.orange;} else if(s.startsWith("140")){r="SCAM HAI"; co=Colors.red;} else {r="SAFE hai"; co=Colors.green;}});}
+            void f2(){var s=b.text.toLowerCase(); setState((){if(s.contains("bit.ly")||s.contains("free")||s.contains("kyc")){r="FAKE LINK"; co=Colors.red;} else {r="Link Safe"; co=Colors.green;}});}
+            void f3(){var s=c.text; setState((){if(s.length>15){r="UPI FRAUD"; co=Colors.red;} else {r="UPI OK"; co=Colors.green;}});}
+            @override Widget build(BuildContext context){
+              var p1=ListView(padding:EdgeInsets.all(16),children:[Icon(Icons.shield,size:80,color:Colors.blue),TextField(controller:a,decoration:InputDecoration(labelText:"Phone Number",border:OutlineInputBorder())),ElevatedButton(onPressed:f1,child:Text("CHECK")),Container(padding:EdgeInsets.all(12),color:co.withOpacity(0.2),child:Text(r,style:TextStyle(color:co,fontWeight:FontWeight.bold)))]);
+              var p2=ListView(padding:EdgeInsets.all(16),children:[Text("11 Features",style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),TextField(controller:b,decoration:InputDecoration(labelText:"1. Link Scanner",border:OutlineInputBorder())),ElevatedButton(onPressed:f2,child:Text("Scan Link")),TextField(controller:c,decoration:InputDecoration(labelText:"2. UPI Checker",border:OutlineInputBorder())),ElevatedButton(onPressed:f3,child:Text("Check UPI")),ListTile(title:Text("3. Job Scam")),ListTile(title:Text("4. Loan Scam")),ListTile(title:Text("5. Lottery Scam")),ListTile(title:Text("6. KYC Scam")),ListTile(title:Text("7. OTP Fraud")),ListTile(title:Text("8. WhatsApp Scam")),ListTile(title:Text("9. OLX Scam")),ListTile(title:Text("10. Blacklist")),ListTile(title:Text("11. Auto Alert")),Text(r,style:TextStyle(color:co,fontWeight:FontWeight.bold))]);
+              return Scaffold(appBar:AppBar(title:Text("Scam Shield")),body:t==0?p1:p2,bottomNavigationBar:BottomNavigationBar(currentIndex:t,onTap:(i){setState(()=>t=i);},items:[BottomNavigationBarItem(icon:Icon(Icons.phone),label:"Number"),BottomNavigationBarItem(icon:Icon(Icons.list),label:"11 Features")]));
             }
           }
-          ENDOFFILE
+          ENDDART
       - run: cd myapp && flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
